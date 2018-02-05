@@ -16,14 +16,22 @@ public class PA3Main {
         try {
             in = new Scanner(new File(args[0]));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("ERROR: File not found");
+            System.exit(1);
         }
-        int cusPrice = Integer.valueOf(in.nextLine());
+        int cusPrice = 0;
+        try {
+            cusPrice = Integer.valueOf(in.nextLine());
+        } catch (Exception ex) {
+            System.out.println("ERROR: Incorrect budget input");
+            System.exit(1);
+        }
         HashMap<String, Integer> foods = new HashMap<String, Integer>();
         while (in.hasNextLine()) {
-            String[] food = in.nextLine().split(" ");
-            foods.put(food[0].substring(0, food[0].length() - 1),
-                    maxAmount(food));
+            String[] food = in.nextLine().split(":");
+            String[] numbers = food[1].split(" ");
+            foods.put(food[0],
+                    maxAmount(numbers));
         }
         ArrayList<String> foodsSorted = new ArrayList<String>(foods.keySet());
         Collections.sort(foodsSorted);
@@ -41,8 +49,12 @@ public class PA3Main {
         Integer[] intFood = new Integer[food.length - 1];
         Integer[] maxInt = new Integer[food.length - 1];
         for (int i = 0; i < food.length - 1; i++) {
+            try {
             intFood[i] = Integer.parseInt(food[i + 1]);
             maxInt[i] = 0;
+            } catch (Exception ex) {
+                return -1;
+            }
         }
         int max=0;
         int total = 0;
@@ -121,7 +133,7 @@ public class PA3Main {
         I = 0;
             return;
     }
-        for (int i = 0; i <= 9; i++) {
+        for (int i = 0; i <= foods.keySet().size(); i++) {
         barray[I] = i;
             cusEnumerate(N, barray, I + 1, cusPrice, foods, foodsSorted,
                     unique);
@@ -132,6 +144,10 @@ public class PA3Main {
     public static void finalPrint(HashMap<String, Integer> foods,
             ArrayList<String> foodsSorted, int cusPrice) {
         for (String name : foodsSorted) {
+            if (foods.get(name) == -1) {
+                System.out.println("ERROR: Incorrect price input");
+                continue;
+            }
             System.out.println(name + " costs " + " $" + foods.get(name));
         }
         System.out.println();
