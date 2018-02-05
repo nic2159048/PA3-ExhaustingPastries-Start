@@ -1,12 +1,34 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * PA3Main.java, PA3-ExhaustingPastries assignment
  * 
+ * This program may take upwards of a minute to complete, be patient as it needs
+ * this time to check all possibilities
+ * 
+ * INSTRUCTIONS This program calculates the highest profit possible for a
+ * slicing of pastries and how many of them a customer can buy within a budget
+ * 
+ * Input format should be <customer budget integer> <string>: <integer cost of
+ * 1in slice> <integer cost of 2in slice> <integer cost of 3in slice> ...
+ * <string>: <integer cost of 1in slice> <integer cost of 2in slice> <integer
+ * cost of 3in slice> ... ... ... ...
+ * 
+ * The first integer is the budget customers have for buying pastries. This is
+ * followed by a list of pastries, starting with a pastry name, then followed by
+ * the price for length of 1 unit, price per length of 2 units, etc. The file
+ * could have any number of lines and each pastry line could have any number of
+ * length costs. If a pastry has X costs after it, then it is X inches long.
+ * 
+ * 
+ * Written By Nicholas Hernandez
  */
 public class PA3Main {
     public static int[] holdArray;
@@ -91,7 +113,7 @@ public class PA3Main {
     public static int enumerate(int N, Integer[] barray, int I,
             int max, Integer[] foodCopy) {
         // If the length of the array is equal to the potential length of the
-        // pastry it proceeses the array
+        // pastry it processes the array
         if (N == I) {
             // If the length of the sizes is greater than possible the program
             // backtracks
@@ -129,42 +151,45 @@ public class PA3Main {
         for (int i = 0; i <= N - 1; i++) {
             over= over+ barray[i]*(i+1);
     }
-        return over > barray.length;
+        return over != barray.length;
     }
 
+    // Determines the highest amount of unique pastries a person can buy within
+    // their budget
     public static void cusEnumerate(int N, int[] barray, int I, int cusPrice,
             HashMap<String, Integer> foods, ArrayList<String> foodsSorted,
             int unique) {
         if (N == I) {
+            // Calculates the total cost of an array[]
             int total=0;
             int iter = 0;
             for (String name : foodsSorted) {
                 total = total + (foods.get(name) * barray[iter]);
                 iter = iter + 1;
             }
+            // If the customer can't afford a pastry you backtrack
             if (total > cusPrice) {
                 I = 0;
                 return;
             }
+            // Calculates the potential unique combos of pricing
             int potential = 0;
             for (int j : barray)
                 if (j > 0) {
                     potential = potential + 1;
                 }
+            // if potential is higher than previous unique new unique array is
+            // saved to holdArray
             if (potential >= unique) {
                 unique = potential;
                 holdArray = barray.clone();
                 I = 0;
-                // System.out.println(Arrays.toString(holdArray));
                 return;
             }
-            // for (int j : barray)
-            // System.out.print(j);
-            // System.out.println();
-
         I = 0;
             return;
     }
+        // Loops through the many combinations recursively
         for (int i = 0; i <= 1; i++) {
         barray[I] = i;
             cusEnumerate(N, barray, I + 1, cusPrice, foods, foodsSorted,
@@ -173,13 +198,16 @@ public class PA3Main {
         return;
     }
 
+    // Prints the final output
     public static void finalPrint(HashMap<String, Integer> foods,
             ArrayList<String> foodsSorted, int cusPrice) {
+        // if an error has occurred in handling error is printed first
         for (String name : foodsSorted) {
             if (foods.get(name) == -1) {
                 System.out.println("ERROR: Incorrect price input");
             }
         }
+        // Prints the cost of each food and skips errors
         for (String name : foodsSorted) {
             if (foods.get(name) == -1) {
                 continue;
@@ -187,26 +215,31 @@ public class PA3Main {
             System.out.println(name + " costs " + " $" + foods.get(name));
         }
         System.out.println();
+        // Initialization of array list for printing
         int i = 0;
         int potential = 0;
         ArrayList<Integer> valuesList = new ArrayList<Integer>(foods.values());
+        // Deletes duplicates for prices
+        Set<Integer> temp = new HashSet<>();
+        temp.addAll(valuesList);
+        valuesList.clear();
+        valuesList.addAll(temp);
         Collections.sort(valuesList);
-        for (Integer integer : valuesList) {
+        // Prints what foods can be bought in ascending money order and
+        // alphabetical order second based on uniques
+        System.out.println(Arrays.toString(holdArray));
             for (String name : foodsSorted) {
-                if (integer != foods.get(name)) {
+            System.out.println(name);
+            if (holdArray[i] >= 1) {
+                if (foods.get(name) < 0) {
                     continue;
                 }
-                if (holdArray[i] >= 1) {
-                    if (foods.get(name) < 0) {
-                        continue;
-                    }
-                    System.out.println(
-                            "Can buy " + name + " for $" + foods.get(name));
-                    potential = potential + 1;
-                }
-                i = i + 1;
+                System.out.println(
+                        "Can buy " + name + " for $" + foods.get(name));
+                potential = potential + 1;
             }
-        }
+            i = i + 1;
+            }
 
         System.out.println();
         System.out.println("The max number of unique pastries that can be bought with $" + cusPrice + " is: "+ potential);
