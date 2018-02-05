@@ -9,6 +9,7 @@ import java.util.Scanner;
  * 
  */
 public class PA3Main {
+    public static int[] holdArray;
     public static void main(String[] args) {
         // Initializes scanner
         Scanner in = null;
@@ -26,13 +27,14 @@ public class PA3Main {
         }
         ArrayList<String> foodsSorted = new ArrayList<String>(foods.keySet());
         Collections.sort(foodsSorted);
-        for (String name : foodsSorted) {
-            System.out.println(name + " " + foods.get(name));
-        }
-        int[] holdArray = new int[foodsSorted.size()];
+
+        int[] holdArray1 = new int[foodsSorted.size()];
+
         int unique = 0;
-        cusEnumerate(foodsSorted.size(), holdArray, 0, cusPrice, foods,
+        cusEnumerate(foodsSorted.size(), holdArray1, 0,
+                cusPrice, foods,
                 foodsSorted, unique);
+        finalPrint(foods, foodsSorted, cusPrice);
     }
 
     public static int maxAmount(String[] food) {
@@ -105,22 +107,49 @@ public class PA3Main {
                 if (j > 0) {
                     potential = potential + 1;
                 }
-            if (potential > unique) {
+            if (potential >= unique) {
                 unique = potential;
+                holdArray = barray.clone();
                 I = 0;
+                // System.out.println(Arrays.toString(holdArray));
                 return;
             }
-            for (int j : barray)
-            System.out.print(j);
-        System.out.println();
+            // for (int j : barray)
+            // System.out.print(j);
+            // System.out.println();
 
         I = 0;
-        return;
+            return;
     }
         for (int i = 0; i <= 9; i++) {
         barray[I] = i;
             cusEnumerate(N, barray, I + 1, cusPrice, foods, foodsSorted,
                     unique);
+    }
+        return;
+    }
+
+    public static void finalPrint(HashMap<String, Integer> foods,
+            ArrayList<String> foodsSorted, int cusPrice) {
+        for (String name : foodsSorted) {
+            System.out.println(name + " costs " + " $" + foods.get(name));
+        }
+        System.out.println();
+        int i = 0;
+        for (String name : foodsSorted) {
+            if (holdArray[i] >= 1) {
+                System.out.println(
+                        "Can buy " + name + " for $" + foods.get(name));
+            }
+            i = i + 1;
+
+        }
+        System.out.println();
+        int potential=0;
+        for (int j : holdArray)
+            if (j > 0) {
+                potential = potential + 1;
+        System.out.println("The max number of unique pastries that can be bought with $" + cusPrice + " is: "+ potential);
     }
     }
 }
